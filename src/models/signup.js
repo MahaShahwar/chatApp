@@ -7,7 +7,8 @@ const signup = new mongoose.Schema({
     },
     email:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     password:{
         type:String,
@@ -17,6 +18,6 @@ const signup = new mongoose.Schema({
         type:Number,
     }
 })
-//Creating collection in database
+//Creating collection in database(name in database is the one with "")
 const signUp=new mongoose.model("signup",signup)
 module.exports=signUp
