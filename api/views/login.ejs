@@ -1,0 +1,16 @@
+<h1>login</h1>
+
+<form action="/login" method="POST">
+    <input type="text" name="username"
+        placeholder="username">
+    <input type="password" name="password"
+        placeholder="password">
+    <button onclick="tokenStore()">login</button>
+</form>
+
+<script>
+        console.log('here')
+        localStorage.setItem('token', token)
+        console.log(token)
+</script>
+ 

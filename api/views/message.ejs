@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <title>Chat app</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-sm-12">
+                <h1 class="text-center">
+                    Chat App 
+                </h1>
+                <div id="status"></div>
+                
+                    <div id="chat">
+                        <form >
+                        <input type="text" id="receiverName" name="chatId" class="form-control" value="">
+                        <br>
+                        <div class="card">
+                            <div id="messages" class="card-block" style="overflow-y: auto;height: 300px;">
+                                
+                            </div>
+                        </div>
+                        <br>
+                        
+                            <textarea id="textarea" name="content" class="form-control" placeholder="Enter message..."></textarea>
+                            <button id="button1">Send</button>
+                        </form>
+                    </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+        // console.log('here')
+        // console.log('checking of local storage',localStorage.getItem("check"))
+
+        document.getElementById('receiverName').value=localStorage.getItem('check')
+        console.log('getting url')
+        //Get url and extract chatID from url
+        var url_string = window.location.href; 
+        console.log(url_string)
+        var url = new URL(url_string);
+        var chatId = url.searchParams.get("chatID");
+        
+        
+
+        var element = function(id){
+            return document.getElementById(id);
+        }
+
+        // Get Elements
+        
+        var textarea = element('textarea');
+        // var username = element('chatId');
+        var btn=element('button1')
+
+
+        // Connect to socket.io
+        const socket = new io("http://localhost:3000");
+
+        //sending chatid to display all messages function
+        if(document.getElementById('receiverName').value){
+            console.log('check')
+            //sending to server
+            socket.emit('allChat', {chatId:chatId});
+        }
+
+        // Check for connection
+        if(socket !== undefined){
+            console.log('Connected to socket...');
+
+            //Displaying all the messages from database
+            socket.on('allmsgs',function(data){
+                console.log('in first connected function')
+                if(data.length>0){
+                    for(var x = 0;x < data.length;x++){
+                        // Build out message div
+                        var message = document.createElement('div');
+                        message.textContent = data[x].sender+": "+data[x].content;
+                        messages.appendChild(message);
+                        messages.insertBefore(message, messages.firstChild);
+                    }
+                    
+                }
+            })
+
+            // Handle Output, receive from server new message
+            socket.on('output', function(data){
+                //Display new message on screen
+                if(data){
+                        // Build out message div
+                        var message = document.createElement('div');
+                        message.textContent = data.sender+": "+data.content;
+                        messages.appendChild(message);
+                        messages.insertBefore(message, messages.firstChild);        
+                }
+            });
+
+            // Sending new message data to server
+            btn.addEventListener('click', function(event){
+                    // Emit to server input, send to server
+                    console.log("in function")
+                    socket.emit('input', {
+                        chatId:chatId,
+                        content:textarea.value
+                    });
+
+                    event.preventDefault();
+                })}
+</script>
+</html>

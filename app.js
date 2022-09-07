@@ -75,6 +75,13 @@ app.get('/chat',(req,res)=>{
 app.get('/message',auth,(req,res)=>{
     res.render('./message')
 })
+
+app.get('/logout',auth,(req,res)=>{
+  res.status(200).clearCookie('Token', {
+    path: '/'
+  });
+
+})
 app.use('/',chat)
 
 // app.use('/',message)
